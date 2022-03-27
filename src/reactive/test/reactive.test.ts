@@ -1,5 +1,5 @@
 import { effect, stop } from "../effect";
-import reactive from "../reactive";
+import { reactive } from "../reactive";
 
 describe("happy path", () => {
   test("reactive", () => {
@@ -31,17 +31,18 @@ describe("happy path", () => {
         value: 10,
       },
     });
-
-    let v;
-    const runner = effect(() => {
-      v = ++state.data.value;
+    const effectFn = jest.fn(() => {
+      v = state.data.value + 1;
       return true;
     });
+
+    let v;
+    const runner = effect(effectFn);
 
     expect(v).toBe(11);
     const r = runner();
     expect(r).toBe(true);
-    expect(v).toBe(12);
+    expect(effectFn).toHaveBeenCalledTimes(2);
   });
   test("schedule", () => {
     let run;

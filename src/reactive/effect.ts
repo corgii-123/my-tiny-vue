@@ -37,10 +37,15 @@ function cleanEffect(effect) {
   effect.depsSet.forEach((deps) => {
     deps.delete(effect);
   });
+  // 清空集合
+  effect.depsSet = new Set();
 }
 
 const targetMap = new Map();
 export function track(target, key) {
+  // 不是在依赖中访问，直接返回，不做收集
+  if (!activeEffect) return;
+
   if (!targetMap.has(target)) {
     targetMap.set(target, new Map());
   }
@@ -50,7 +55,6 @@ export function track(target, key) {
   }
   const deps = depsMap.get(key);
 
-  if (!activeEffect) return;
   deps.add(activeEffect);
   activeEffect.depsSet.add(deps);
 }

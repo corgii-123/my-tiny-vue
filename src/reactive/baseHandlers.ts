@@ -1,4 +1,6 @@
+import { isObject } from "../common";
 import { track, trigger } from "./effect";
+import { reactive, readonly, STATIC_VAR } from "./reactive";
 
 const get = createGetter();
 const readonlyGet = createGetter(true);
@@ -19,9 +21,20 @@ function createSetter(isReadonly = false) {
 
 function createGetter(isReadonly = false) {
   return function (target, key) {
+    if (key === STATIC_VAR.IS_REACTIVE) return !isReadonly;
+    if (key === STATIC_VAR.IS_READONLY) return isReadonly;
+
+    // 收集依赖
     isReadonly || track(target, key);
 
-    return Reflect.get(target, key);
+    const res = Reflect.get(target, key);
+
+    // 判断是否需要嵌套
+    if (isObject(res)) {
+      return isReadonly ? readonly(res) : reactive(res);
+    }
+
+    return res;
   };
 }
 
