@@ -2,7 +2,7 @@ import { extend } from "../common";
 
 let activeEffect: ReactiveEffect | null = null;
 
-class ReactiveEffect {
+export class ReactiveEffect {
   private _fn: () => any;
   schedule?: () => any;
   depsSet: Set<Set<ReactiveEffect>> = new Set();
@@ -55,6 +55,13 @@ export function track(target, key) {
   }
   const deps = depsMap.get(key);
 
+  collectDeps(deps);
+}
+
+export function collectDeps(deps) {
+  // 不是在依赖中访问，直接返回，不做收集
+  if (!activeEffect) return;
+
   deps.add(activeEffect);
   activeEffect.depsSet.add(deps);
 }
@@ -74,6 +81,10 @@ export function trigger(target, key, value) {
   const depsMap = targetMap.get(target);
   const deps = depsMap.get(key);
 
+  triggerDeps(deps);
+}
+
+export function triggerDeps(deps) {
   deps.forEach((reactiveEffect) => {
     if (reactiveEffect.schedule) {
       reactiveEffect.schedule();

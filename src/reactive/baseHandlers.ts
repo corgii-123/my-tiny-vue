@@ -1,11 +1,12 @@
-import { isObject } from "../common";
+import { extend, isChanged, isObject } from "../common";
 import { track, trigger } from "./effect";
-import { reactive, readonly, STATIC_VAR } from "./reactive";
+import { isProxy, reactive, readonly, STATIC_VAR } from "./reactive";
 
 const get = createGetter();
 const readonlyGet = createGetter(true);
 const set = createSetter();
 const readonlySet = createSetter(true);
+const shallowReadonlyGet = createGetter(true, true);
 
 function createSetter(isReadonly = false) {
   return function (target, key, value) {
@@ -13,13 +14,17 @@ function createSetter(isReadonly = false) {
       console.warn(`readonly can't be setted`);
       return true;
     }
-    const res = Reflect.set(target, key, value);
-    trigger(target, key, value);
-    return res;
+
+    if (isChanged(value, Reflect.get(target, key))) {
+      const res = Reflect.set(target, key, value);
+      trigger(target, key, value);
+      return res;
+    }
+    return true;
   };
 }
 
-function createGetter(isReadonly = false) {
+function createGetter(isReadonly = false, isShallow = false) {
   return function (target, key) {
     if (key === STATIC_VAR.IS_REACTIVE) return !isReadonly;
     if (key === STATIC_VAR.IS_READONLY) return isReadonly;
@@ -29,11 +34,16 @@ function createGetter(isReadonly = false) {
 
     const res = Reflect.get(target, key);
 
+    if (isShallow) {
+      return res;
+    }
+
     // 判断是否需要嵌套
-    if (isObject(res)) {
+    if (isObject(res) && !isProxy(res)) {
       return isReadonly ? readonly(res) : reactive(res);
     }
 
+    // 增加完嵌套后再返回
     return res;
   };
 }
@@ -50,4 +60,10 @@ export function readonlyHandlers() {
     get: readonlyGet,
     set: readonlySet,
   };
+}
+
+export function shallowReadonlyHandlers() {
+  return extend(readonlyHandlers(), {
+    get: shallowReadonlyGet,
+  });
 }

@@ -1,5 +1,12 @@
 import { effect } from "../effect";
-import { reactive, readonly, isReadonly, isReactive } from "../reactive";
+import {
+  reactive,
+  readonly,
+  isReadonly,
+  isReactive,
+  shallowReadonly,
+  isProxy,
+} from "../reactive";
 
 describe("readonly happy path", () => {
   test("readonly", () => {
@@ -39,5 +46,27 @@ describe("readonly happy path", () => {
 
     expect(m).toBe("Hello Vue!");
     expect(isReactive(state.data)).toBe(true);
+  });
+  test("shallow readonly", () => {
+    const ro = shallowReadonly({
+      value: 1,
+      data: {
+        value: 2,
+      },
+    });
+
+    expect(isReadonly(ro.value)).toBeTruthy;
+    expect(isReadonly(ro.data.value)).toBeFalsy;
+  });
+  test("is Proxy", () => {
+    const r = reactive({
+      value: 1,
+    });
+    const raw = {
+      value: 1,
+    };
+
+    expect(isProxy(r)).toBeTruthy;
+    expect(isProxy(raw)).toBe(false);
   });
 });

@@ -98,4 +98,16 @@ describe("happy path", () => {
     runner();
     expect(b).toBe(12);
   });
+  test("some edge situation", () => {
+    const state = reactive({});
+
+    let dep;
+    effect(() => {
+      dep = state.value + 1;
+    });
+
+    expect(dep).toBe(NaN);
+    state.value = "a";
+    expect(dep).toBe("a1");
+  });
 });
