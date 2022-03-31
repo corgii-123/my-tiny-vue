@@ -1,6 +1,7 @@
 import { isOwned } from "../common";
 const dollarKeyMap = {
   $el: (i) => i.vnode.el,
+  props: (i) => i.props,
 };
 
 export function componentInitProxy(instance, setupResult) {

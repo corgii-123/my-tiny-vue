@@ -3,7 +3,6 @@ import Foo from "./Foo";
 
 export default {
   render() {
-    window.my = this;
     return h("div", { class: "root" }, [
       h("div", {}, "Hello World"),
       h("div", { id: "my-count" }, this.state.count),

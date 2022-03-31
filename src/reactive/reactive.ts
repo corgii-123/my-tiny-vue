@@ -1,3 +1,4 @@
+import { isObject } from "../common";
 import {
   mutableHandlers,
   readonlyHandlers,
@@ -18,7 +19,9 @@ export function readonly(raw) {
 }
 
 export function shallowReadonly(raw) {
-  return new Proxy(raw, shallowReadonlyHandlers());
+  return isObject(raw)
+    ? new Proxy(raw, shallowReadonlyHandlers())
+    : console.warn("the params in shallowReadonly should be object");
 }
 
 export function isReactive(raw) {

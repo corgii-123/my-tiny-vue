@@ -1,4 +1,5 @@
 import { componentInitProxy } from "./componentInitProxy";
+import { initProps } from "./componentProps";
 
 export function createComponentInstance(vnode) {
   const instance = {
@@ -15,7 +16,7 @@ export function createComponentInstance(vnode) {
 }
 
 export function setupComponent(instance) {
-  // initProps(instance)
+  initProps(instance);
   // initSlot(instance)
   setupStatefulComponent(instance);
 }

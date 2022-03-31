@@ -29,7 +29,7 @@ function mountElement(vnode: any, container: any) {
   for (let k in props) {
     // 匹配事件
     if (k.match(/^on[A-Z]/)) {
-      const str = k.split("on")[0];
+      const str = k.split("on")[1];
       const event = str[0].toLowerCase() + str.slice(1);
       el.addEventListener(event, props[k]);
     } else {

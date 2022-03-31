@@ -2,6 +2,7 @@ import { h } from "../runtime-core";
 
 export default {
   render() {
+    window.my = this;
     return h("div", {}, [
       h("span", {}, this.props.count),
       h(
