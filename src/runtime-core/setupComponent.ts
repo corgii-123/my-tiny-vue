@@ -1,3 +1,4 @@
+import { createEmit } from "./componentInitEmit";
 import { componentInitProxy } from "./componentInitProxy";
 import { initProps } from "./componentProps";
 
@@ -7,10 +8,11 @@ export function createComponentInstance(vnode) {
     type: vnode.type,
     setupState: {},
     render: () => {},
-    emit: () => {},
+    emit: (event: any, ...params: any[]) => {},
     props: {},
     proxy: {},
   };
+  instance.emit = createEmit(instance);
 
   return instance;
 }

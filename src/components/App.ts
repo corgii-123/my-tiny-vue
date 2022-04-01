@@ -9,6 +9,9 @@ export default {
       h("div", {}, this.$el),
       h(Foo, {
         count: this.state.count,
+        onSay: (v) => {
+          console.log("say emit", v);
+        },
       }),
     ]);
   },

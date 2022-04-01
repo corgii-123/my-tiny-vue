@@ -19,6 +19,7 @@ export default {
 
     function handleClick() {
       console.log("ok");
+      emit("say", props);
     }
 
     return {
