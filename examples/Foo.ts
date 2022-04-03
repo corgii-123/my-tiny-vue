@@ -1,8 +1,6 @@
-import { h } from "../runtime-core";
-
-export default {
+import { getCurrentInstance, h, inject, renderSlots } from "../src";
+const Foo: any = {
   render() {
-    window.my = this;
     return h("div", {}, [
       h("span", {}, this.props.count),
       h(
@@ -12,18 +10,26 @@ export default {
         },
         "click"
       ),
+      renderSlots(this.$slots),
     ]);
   },
   setup(props, { emit }) {
     console.log(props);
+    console.log(getCurrentInstance());
 
     function handleClick() {
       console.log("ok");
       emit("say", props);
     }
 
+    const prov = inject("prov");
+    const p = inject("p", "default value");
+    console.log(`prov:`, prov, `default:`, p);
+
     return {
       handleClick,
     };
   },
 };
+
+export default Foo;

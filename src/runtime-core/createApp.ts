@@ -6,7 +6,7 @@ export default function (rootComponent) {
     mount(rootContainer) {
       const vnode = createVNode(rootComponent);
       const rootContainerDOM = document.querySelector(rootContainer);
-      render(vnode, rootContainerDOM);
+      render(vnode, rootContainerDOM, null);
     },
   };
 }
