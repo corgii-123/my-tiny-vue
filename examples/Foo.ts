@@ -1,4 +1,5 @@
-import { getCurrentInstance, h, inject, renderSlots } from "../src";
+import { getCurrentInstance, h, inject, ref, renderSlots, TEXT } from "../src";
+
 const Foo: any = {
   render() {
     return h("div", {}, [

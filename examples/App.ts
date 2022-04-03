@@ -1,4 +1,4 @@
-import { h, TEXT, provide } from "../src";
+import { h, TEXT, provide, reactive } from "../src";
 import Foo from "./Foo";
 
 const App: any = {
@@ -6,13 +6,12 @@ const App: any = {
     return h("div", { class: "root" }, [
       h("div", {}, "Hello World"),
       h("div", { id: "my-count" }, this.state.count),
-      h("div", {}, this.$el),
       h(
         Foo,
         {
           count: this.state.count,
           onSay: (v) => {
-            console.log("say emit", v);
+            this.state.count++;
           },
         },
         [h("p", {}, "slots"), h("p", {}, "slots"), h(TEXT, {}, "im TEXT")]
@@ -20,9 +19,9 @@ const App: any = {
     ]);
   },
   setup(props, { emit }) {
-    const state = {
+    const state = reactive({
       count: 2,
-    };
+    });
     provide("prov", 0);
 
     return {

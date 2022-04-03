@@ -1,3 +1,4 @@
+import { proxyRef } from "../reactive";
 import { createEmit } from "./componentInitEmit";
 import { componentInitProxy } from "./componentInitProxy";
 import { initSlots } from "./componentInitSlots";
@@ -15,6 +16,8 @@ export function createComponentInstance(vnode, parentInstance) {
     slots: [],
     provide: Object.create(parentInstance ? parentInstance.provide : {}),
     parentInstance: parentInstance || {},
+    isMounted: false,
+    oldTree: {},
   };
   instance.emit = createEmit(instance);
 
@@ -37,7 +40,7 @@ function setupStatefulComponent(instance: any) {
   setCurrentInstance(null);
 
   // Proxy代理
-  instance.proxy = componentInitProxy(instance, instance.setupState);
+  instance.proxy = componentInitProxy(instance, proxyRef(instance.setupState));
 
   handleStateResult(instance);
 }
