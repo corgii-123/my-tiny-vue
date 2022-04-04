@@ -1,9 +1,10 @@
-import { getCurrentInstance, h, inject, ref, renderSlots, TEXT } from "../src";
+import { getCurrentInstance, h, inject, ref, renderSlots } from "../src";
+import My from "./My";
 
 const Foo: any = {
   render() {
     return h("div", {}, [
-      h("span", {}, this.props.count),
+      h("span", {}, this.data.toString()),
       h(
         "button",
         {
@@ -12,9 +13,13 @@ const Foo: any = {
         "click"
       ),
       renderSlots(this.$slots),
+      h(My, {
+        count: this.data,
+      }),
     ]);
   },
   setup(props, { emit }) {
+    const data = ref(0);
     console.log(props);
     console.log(getCurrentInstance());
 
@@ -29,6 +34,7 @@ const Foo: any = {
 
     return {
       handleClick,
+      data,
     };
   },
 };

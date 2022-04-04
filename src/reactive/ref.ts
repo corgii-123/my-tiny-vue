@@ -47,6 +47,7 @@ export function proxyRef(state) {
   return new Proxy(state, {
     get(target, key) {
       const res = Reflect.get(target, key);
+
       return isRef(res) ? unRef(res) : res;
     },
     set(target, key, value) {

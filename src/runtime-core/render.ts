@@ -5,7 +5,14 @@ import createAppAPI from "./createApp";
 import { createComponentInstance, setupComponent } from "./setupComponent";
 
 export function createRender(options) {
-  const { insertEl, createElement, patchProps: hostPatchProps } = options;
+  const {
+    insertEl: hostInserEl,
+    createElement: hostCreateElement,
+    patchProps: hostPatchProps,
+    appendText: hostAppendText,
+    remove: hostRemove,
+    mountText: hostMountText,
+  } = options;
 
   function render(n1, n2, container, parentInstance) {
     patch(n1, n2, container, parentInstance);
@@ -32,13 +39,14 @@ export function createRender(options) {
   }
   function processText(n1, n2, container: any) {
     if (n1) {
+      patchText(n1, n2, container);
     } else {
       mountText(n2, container);
     }
   }
   function processElement(n1, n2, container, parentInstance) {
     if (n1) {
-      patchElement(n1, n2);
+      patchElement(n1, n2, parentInstance);
     } else {
       mountElement(n2, container, parentInstance);
     }
@@ -47,25 +55,57 @@ export function createRender(options) {
     mountComponent(n2, container, parentInstance);
   }
 
-  function patchElement(n1, n2) {
+  function patchText(n1, n2, container) {
+    if (n1.children === n2.children) return;
+    mountText(n2, container);
+  }
+
+  function patchElement(n1, n2, parentInstance) {
     console.log("n1:", n1);
     console.log("n2:", n2);
 
     n2.el = n1.el;
 
     const el = n2.el;
-    const { props: props1 } = n1;
-    const { props: props2 } = n2;
+    const { props: props1, children: children1 } = n1;
+    const { props: props2, children: children2 } = n2;
     hostPatchProps(el, props1, props2);
+
+    patchChildren(el, children1, children2, parentInstance);
+  }
+
+  function patchChildren(el, oldChildren, newChildren, parentInstance) {
+    if (oldChildren === newChildren) return;
+    console.log(oldChildren, newChildren);
+
+    if (typeof newChildren === "string") {
+      if (Array.isArray(oldChildren)) {
+        unmountChildren(oldChildren);
+        hostAppendText(el, newChildren);
+      } else if (typeof oldChildren === "string") {
+        hostAppendText(el, newChildren);
+      }
+    } else if (Array.isArray(newChildren)) {
+      if (typeof oldChildren === "string") {
+        hostAppendText(el, ``);
+        mountChildren(el, newChildren, parentInstance);
+      } else if (Array.isArray(oldChildren)) {
+      }
+    }
+  }
+
+  function unmountChildren(children) {
+    children.forEach((child) => {
+      hostRemove(child);
+    });
   }
 
   function mountText(n2, container) {
-    const el = document.createTextNode(n2.children);
-    container.append(el);
+    hostMountText(n2, container);
   }
   function mountElement(vnode: any, container: any, parentInstance) {
     const { type, props, children } = vnode;
-    const el = createElement(type);
+    const el = hostCreateElement(type);
 
     vnode.el = el;
 
@@ -74,10 +114,10 @@ export function createRender(options) {
     if (Array.isArray(children)) {
       mountChildren(el, children, parentInstance);
     } else {
-      el.textContent = children;
+      hostAppendText(el, children);
     }
 
-    insertEl(container, el);
+    hostInserEl(container, el);
   }
   function mountChildren(el, children, parentInstance) {
     children.forEach((vnode) => {
@@ -105,7 +145,6 @@ export function createRender(options) {
         instance.oldTree = subTree;
       } else {
         const subTree = instance.render.call(instance.proxy);
-        console.log(instance.oldTree);
 
         patch(instance.oldTree, subTree, container, instance);
         instance.vnode.el = subTree.el;

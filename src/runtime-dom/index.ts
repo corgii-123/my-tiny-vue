@@ -37,8 +37,25 @@ function insertEl(container, el) {
   container.append(el);
 }
 
+function appendText(el, children) {
+  el.textContent = children;
+}
+
+function remove(childEl) {
+  const parent = childEl.parentNode();
+  parent.removeNode(childEl);
+}
+
+function mountText(n2, container) {
+  const el = document.createTextNode(n2.children);
+  container.append(el);
+}
+
 export const { createApp } = createRender({
   createElement,
   patchProps,
   insertEl,
+  appendText,
+  remove,
+  mountText,
 });

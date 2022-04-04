@@ -8,7 +8,7 @@ const App: any = {
       h(
         "div",
         !this.state.count ? {} : { id: `my-count:${this.state.count}` },
-        this.state.count
+        this.state.count.toString()
       ),
       h(
         Foo,

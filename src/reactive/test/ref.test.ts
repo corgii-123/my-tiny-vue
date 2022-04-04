@@ -58,7 +58,7 @@ describe("ref happy path", () => {
     expect(stateProxy.data).toBe(0);
     expect(stateProxy.message).toBe("Hello World");
 
-    stateProxy.data = 1;
+    stateProxy.data++;
     expect(fn).toHaveBeenCalledTimes(2);
     expect(stateProxy.data).toBe(1);
     expect(state.data.value).toBe(1);

@@ -17,6 +17,7 @@ export function componentInitProxy(instance, setupResult) {
           return res;
         }
       },
+      // 这里其实还需要设置set的情况，为了处理ref的情况
     }
   );
   return instance.proxy;
