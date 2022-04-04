@@ -6,15 +6,29 @@ function createElement(type) {
   return document.createElement(type);
 }
 
-function patchProps(el, props) {
-  for (let k in props) {
-    // 匹配事件
-    if (k.match(/^on[A-Z]/)) {
-      const str = k.split("on")[1];
-      const event = str[0].toLowerCase() + str.slice(1);
-      el.addEventListener(event, props[k]);
-    } else {
-      el.setAttribute(k, props[k]);
+function patchProps(el, oldProps, newProps) {
+  if (!oldProps) {
+    for (let k in newProps) {
+      // 匹配事件
+      if (k.match(/^on[A-Z]/)) {
+        const str = k.split("on")[1];
+        const event = str[0].toLowerCase() + str.slice(1);
+        el.addEventListener(event, newProps[k]);
+      } else {
+        el.setAttribute(k, newProps[k]);
+      }
+    }
+  } else {
+    for (let k in newProps) {
+      if (oldProps[k] !== newProps[k]) {
+        el.setAttribute(k, newProps[k]);
+      }
+    }
+
+    for (let k in oldProps) {
+      if (newProps[k] === undefined) {
+        el.removeAttribute(k);
+      }
     }
   }
 }

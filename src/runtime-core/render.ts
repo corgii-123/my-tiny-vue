@@ -5,7 +5,7 @@ import createAppAPI from "./createApp";
 import { createComponentInstance, setupComponent } from "./setupComponent";
 
 export function createRender(options) {
-  const { insertEl, createElement, patchProps } = options;
+  const { insertEl, createElement, patchProps: hostPatchProps } = options;
 
   function render(n1, n2, container, parentInstance) {
     patch(n1, n2, container, parentInstance);
@@ -38,7 +38,7 @@ export function createRender(options) {
   }
   function processElement(n1, n2, container, parentInstance) {
     if (n1) {
-      patchElement(n1, n2, container, parentInstance);
+      patchElement(n1, n2);
     } else {
       mountElement(n2, container, parentInstance);
     }
@@ -47,9 +47,16 @@ export function createRender(options) {
     mountComponent(n2, container, parentInstance);
   }
 
-  function patchElement(n1, n2, container, parentInstance) {
-    console.log("old vnode", n1);
-    console.log("new vnode", n2);
+  function patchElement(n1, n2) {
+    console.log("n1:", n1);
+    console.log("n2:", n2);
+
+    n2.el = n1.el;
+
+    const el = n2.el;
+    const { props: props1 } = n1;
+    const { props: props2 } = n2;
+    hostPatchProps(el, props1, props2);
   }
 
   function mountText(n2, container) {
@@ -62,12 +69,12 @@ export function createRender(options) {
 
     vnode.el = el;
 
-    patchProps(el, props);
+    hostPatchProps(el, null, props);
 
     if (Array.isArray(children)) {
       mountChildren(el, children, parentInstance);
     } else {
-      if (children) el.textContent = children;
+      el.textContent = children;
     }
 
     insertEl(container, el);
@@ -93,7 +100,6 @@ export function createRender(options) {
       if (!instance.isMounted) {
         const subTree = instance.render.call(instance.proxy);
         patch(null, subTree, container, instance);
-
         instance.vnode.el = subTree.el;
         instance.isMounted = true;
         instance.oldTree = subTree;
@@ -102,7 +108,7 @@ export function createRender(options) {
         console.log(instance.oldTree);
 
         patch(instance.oldTree, subTree, container, instance);
-        subTree.el = instance.oldTree.el;
+        instance.vnode.el = subTree.el;
         instance.oldTree = subTree;
       }
     });

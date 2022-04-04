@@ -3,9 +3,13 @@ import Foo from "./Foo";
 
 const App: any = {
   render() {
-    return h("div", { class: "root" }, [
+    return h("div", {}, [
       h("div", {}, "Hello World"),
-      h("div", { id: "my-count" }, this.state.count),
+      h(
+        "div",
+        !this.state.count ? {} : { id: `my-count:${this.state.count}` },
+        this.state.count
+      ),
       h(
         Foo,
         {
@@ -20,7 +24,7 @@ const App: any = {
   },
   setup(props, { emit }) {
     const state = reactive({
-      count: 2,
+      count: 0,
     });
     provide("prov", 0);
 
